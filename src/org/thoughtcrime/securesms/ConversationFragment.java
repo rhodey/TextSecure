@@ -63,17 +63,20 @@ public class ConversationFragment extends ListFragment
 
   @Override
   public void onCreate(Bundle icicle) {
+    Log.d(TAG, "ON CREATE");
     super.onCreate(icicle);
     this.masterSecret = getArguments().getParcelable("master_secret");
   }
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle bundle) {
+    Log.d(TAG, "ON CREATE VIEW");
     return inflater.inflate(R.layout.conversation_fragment, container, false);
   }
 
   @Override
   public void onActivityCreated(Bundle bundle) {
+    Log.d(TAG, "ON ACTIVITY CREATED");
     super.onActivityCreated(bundle);
 
     initializeResources();
@@ -83,21 +86,26 @@ public class ConversationFragment extends ListFragment
 
   @Override
   public void onAttach(Activity activity) {
+    Log.d(TAG, "ON ATTACH");
     super.onAttach(activity);
     this.listener = (ConversationFragmentListener)activity;
   }
 
   @Override
   public void onResume() {
+    Log.d(TAG, "ON RESUME");
     super.onResume();
 
     if (getListAdapter() != null) {
+      Log.d(TAG, "NOT NULL, NOTIFY CHANGE");
       ((ConversationAdapter) getListAdapter()).notifyDataSetChanged();
     }
   }
 
   public void onNewIntent() {
+    Log.d(TAG, "ON NEW INTENT");
     if (actionMode != null) {
+      Log.d(TAG, "AM NOT NULL, GONNA FINISH AB");
       actionMode.finish();
     }
 
@@ -105,6 +113,7 @@ public class ConversationFragment extends ListFragment
     initializeListAdapter();
 
     if (threadId == -1) {
+      Log.d(TAG, "THREAD == -1, RESTART LOADER");
       getLoaderManager().restartLoader(0, null, this);
     }
   }
@@ -112,10 +121,13 @@ public class ConversationFragment extends ListFragment
   private void initializeResources() {
     this.recipients   = RecipientFactory.getRecipientsForIds(getActivity(), getActivity().getIntent().getLongArrayExtra("recipients"), true);
     this.threadId     = this.getActivity().getIntent().getLongExtra("thread_id", -1);
+    Log.d(TAG, "INIT RESOURCES, " + recipients.toShortString() + " | " + threadId);
   }
 
   private void initializeListAdapter() {
+    Log.d(TAG, "INIT LIST ADAPTER");
     if (this.recipients != null && this.threadId != -1) {
+      Log.d(TAG, "**ACTUALLY** INIT LIST ADAPTER");
       this.setListAdapter(new ConversationAdapter(getActivity(), masterSecret, selectionClickListener,
                                                   (!this.recipients.isSingleRecipient()) || this.recipients.isGroupRecipient(),
                                                   DirectoryHelper.isPushDestination(getActivity(), this.recipients)));
@@ -125,11 +137,13 @@ public class ConversationFragment extends ListFragment
   }
 
   private void initializeContextualActionBar() {
+    Log.d(TAG, "INIT CONTEXT AB");
     getListView().setOnItemClickListener(selectionClickListener);
     getListView().setOnItemLongClickListener(selectionClickListener);
   }
 
   private void setCorrectMenuVisibility(Menu menu) {
+    Log.d(TAG, "SET CORRECT MENU VISIBILITY");
     List<MessageRecord> messageRecords = getSelectedMessageRecords();
 
     if (actionMode != null && messageRecords.size() == 0) {
@@ -169,15 +183,18 @@ public class ConversationFragment extends ListFragment
   }
 
   public void reload(Recipients recipients, long threadId) {
+    Log.d(TAG, "RELOAD >> " + recipients.toShortString());
     this.recipients = recipients;
 
     if (this.threadId != threadId) {
+      Log.d(TAG, "THREAD ID CHANGED, GONNA RE-INIT LIST >> " + threadId);
       this.threadId = threadId;
       initializeListAdapter();
     }
   }
 
   public void scrollToBottom() {
+    Log.d(TAG, "SCROLL TO BOTTOM");
     final ListView list = getListView();
     list.post(new Runnable() {
       @Override
@@ -197,6 +214,7 @@ public class ConversationFragment extends ListFragment
   }
 
   private void handleDeleteMessages(final List<MessageRecord> messageRecords) {
+    Log.d(TAG, "HANDLE DELETE MESSAGE");
     AlertDialogWrapper.Builder builder = new AlertDialogWrapper.Builder(getActivity());
     builder.setTitle(R.string.ConversationFragment_confirm_message_delete);
     builder.setIconAttribute(R.attr.dialog_alert_icon);
@@ -230,6 +248,7 @@ public class ConversationFragment extends ListFragment
   }
 
   private void handleDisplayDetails(MessageRecord message) {
+    Log.d(TAG, "HANDLE DISPLAY DETAILS");
     Intent intent = new Intent(getActivity(), MessageDetailsActivity.class);
     intent.putExtra(MessageDetailsActivity.MASTER_SECRET_EXTRA, masterSecret);
     intent.putExtra(MessageDetailsActivity.MESSAGE_ID_EXTRA, message.getId());
@@ -238,12 +257,14 @@ public class ConversationFragment extends ListFragment
   }
 
   private void handleForwardMessage(MessageRecord message) {
+    Log.d(TAG, "HANDLE FORWARD MESSAGE");
     Intent composeIntent = new Intent(getActivity(), ShareActivity.class);
     composeIntent.putExtra(Intent.EXTRA_TEXT, message.getDisplayBody().toString());
     startActivity(composeIntent);
   }
 
   private void handleResendMessage(final MessageRecord message) {
+    Log.d(TAG, "HANDLE RESEND MESSAGE");
     final Context context = getActivity().getApplicationContext();
     new AsyncTask<MessageRecord, Void, Void>() {
       @Override
@@ -255,6 +276,7 @@ public class ConversationFragment extends ListFragment
   }
 
   private void handleSaveAttachment(final MediaMmsMessageRecord message) {
+    Log.d(TAG, "HANDLE SAVE ATTACH");
     SaveAttachmentTask.showWarningDialog(getActivity(), new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int which) {
 
@@ -278,20 +300,27 @@ public class ConversationFragment extends ListFragment
 
   @Override
   public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+    Log.d(TAG, "ON CREATE LOADER");
     return new ConversationLoader(getActivity(), threadId);
   }
 
   @Override
   public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+    Log.d(TAG, "ON LOAD FINISHED");
     if (getListAdapter() != null) {
       ((CursorAdapter) getListAdapter()).changeCursor(cursor);
+    } else {
+      Log.d(TAG, "LIST ADAPTER IS NULL D:");
     }
   }
 
   @Override
   public void onLoaderReset(Loader<Cursor> arg0) {
+    Log.d(TAG, "ON LOAD RESET");
     if (getListAdapter() != null) {
       ((CursorAdapter) getListAdapter()).changeCursor(null);
+    } else {
+      Log.d(TAG, "LIST ADAPTER IS NULL D:");
     }
   }
 
@@ -335,6 +364,7 @@ public class ConversationFragment extends ListFragment
 
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+      Log.d(TAG, "ON CREATE AM");
       MenuInflater inflater = mode.getMenuInflater();
       inflater.inflate(R.menu.conversation_context, menu);
 
@@ -349,6 +379,7 @@ public class ConversationFragment extends ListFragment
 
     @Override
     public void onDestroyActionMode(ActionMode mode) {
+      Log.d(TAG, "ON DESTORY AM");
       ((ConversationAdapter)getListAdapter()).getBatchSelected().clear();
       ((ConversationAdapter)getListAdapter()).notifyDataSetChanged();
 

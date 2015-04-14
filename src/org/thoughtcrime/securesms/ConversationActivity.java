@@ -162,6 +162,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
 
   @Override
   protected void onPreCreate() {
+    Log.d(TAG, "ON PRE CREATE");
     dynamicTheme.onCreate(this);
     dynamicLanguage.onCreate(this);
     overridePendingTransition(R.anim.slide_from_right, R.anim.fade_scale_out);
@@ -169,6 +170,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
 
   @Override
   protected void onCreate(Bundle state, @NonNull MasterSecret masterSecret) {
+    Log.d(TAG, "ON CREATE");
     this.masterSecret = masterSecret;
 
     setContentView(R.layout.conversation_activity);
@@ -183,7 +185,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
 
   @Override
   protected void onNewIntent(Intent intent) {
-    Log.w(TAG, "onNewIntent()");
+    Log.w(TAG, "ON NEW INTENT");
 
     if (!Util.isEmpty(composeText) || attachmentManager.isAttachmentPresent()) {
       saveDraft();
@@ -196,12 +198,14 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
     initializeDraft();
 
     if (fragment != null) {
+      Log.d(TAG, "FRAGMENT NOT NULL, GONNA ON NEW INTENT");
       fragment.onNewIntent();
     }
   }
 
   @Override
   protected void onResume() {
+    Log.d(TAG, "ON RESUME");
     super.onResume();
     dynamicTheme.onResume(this);
     dynamicLanguage.onResume(this);
@@ -219,6 +223,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
 
   @Override
   protected void onPause() {
+    Log.d(TAG, "ON PAUSE");
     super.onPause();
     MessageNotifier.setVisibleThread(-1L);
     if (isFinishing()) overridePendingTransition(R.anim.fade_scale_in, R.anim.slide_to_right);
@@ -226,6 +231,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
 
   @Override
   protected void onDestroy() {
+    Log.d(TAG, "ON DESTROY");
     saveDraft();
     if (recipients != null)             recipients.removeListener(this);
     if (securityUpdateReceiver != null) unregisterReceiver(securityUpdateReceiver);
@@ -261,6 +267,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
 
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
+    Log.d(TAG, "ON PREPARE OPTIONS MENU");
     MenuInflater inflater = this.getMenuInflater();
     menu.clear();
 
@@ -300,6 +307,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
+    Log.d(TAG, "ON OPTIONES ITEM SELECTED");
     super.onOptionsItemSelected(item);
     switch (item.getItemId()) {
     case R.id.menu_call:                      handleDial(getRecipients().getPrimaryRecipient()); return true;
@@ -323,6 +331,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
 
   @Override
   public void onBackPressed() {
+    Log.d(TAG, "ON BACK PRESSED");
     if (emojiDrawer.isPresent() && emojiDrawer.get().getVisibility() == View.VISIBLE) {
       emojiDrawer.get().setVisibility(View.GONE);
       emojiToggle.toggle();
@@ -334,6 +343,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   //////// Event Handlers
 
   private void handleReturnToConversationList() {
+    Log.d(TAG, "HANDLE RETURN TO CONVO LIST");
     Intent intent = new Intent(this, ConversationListActivity.class);
     intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
     startActivity(intent);
@@ -341,6 +351,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleInviteLink() {
+    Log.d(TAG, "HANDLE INVITE LINK ");
     try {
       boolean a = SecureRandom.getInstance("SHA1PRNG").nextBoolean();
       if (a) composeText.appendInvite(getString(R.string.ConversationActivity_get_with_it, "http://sgnl.link/1IvurmD"));
@@ -351,12 +362,14 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleVerifyIdentity() {
+    Log.d(TAG, "HANDLE VERIFY IDENTITY");
     Intent verifyIdentityIntent = new Intent(this, VerifyIdentityActivity.class);
     verifyIdentityIntent.putExtra("recipient", getRecipients().getPrimaryRecipient().getRecipientId());
     startActivity(verifyIdentityIntent);
   }
 
   private void handleAbortSecureSession() {
+    Log.d(TAG, "HANDLE ABORT SECURE SESSION");
     AlertDialogWrapper.Builder builder = new AlertDialogWrapper.Builder(this);
     builder.setTitle(R.string.ConversationActivity_abort_secure_session_confirmation);
     builder.setIconAttribute(R.attr.dialog_alert_icon);
@@ -390,6 +403,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleViewMedia() {
+    Log.d(TAG, "HANDLE VIEW MEDIA");
     Intent intent = new Intent(this, MediaOverviewActivity.class);
     intent.putExtra(MediaOverviewActivity.THREAD_ID_EXTRA, threadId);
     intent.putExtra(MediaOverviewActivity.RECIPIENT_EXTRA, recipients.getPrimaryRecipient().getRecipientId());
@@ -397,6 +411,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleLeavePushGroup() {
+    Log.d(TAG, "HANDLE LEAVE PUSH GROUP");
     if (getRecipients() == null) {
       Toast.makeText(this, getString(R.string.ConversationActivity_invalid_recipient),
                      Toast.LENGTH_LONG).show();
@@ -438,12 +453,14 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleEditPushGroup() {
+    Log.d(TAG, "HANDLE EDIT PUSH GROUP");
     Intent intent = new Intent(ConversationActivity.this, GroupCreateActivity.class);
     intent.putExtra(GroupCreateActivity.GROUP_RECIPIENT_EXTRA, recipients.getPrimaryRecipient().getRecipientId());
     startActivityForResult(intent, GROUP_EDIT);
   }
 
   private void handleDistributionBroadcastEnabled(MenuItem item) {
+    Log.d(TAG, "HANDLE DISTRIBUTION BROADCAST ENABLED");
     distributionType = ThreadDatabase.DistributionTypes.BROADCAST;
     item.setChecked(true);
 
@@ -460,6 +477,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleDistributionConversationEnabled(MenuItem item) {
+    Log.d(TAG, "HANDLE DISTROBUTION CONVO ENABLED");
     distributionType = ThreadDatabase.DistributionTypes.CONVERSATION;
     item.setChecked(true);
 
@@ -476,6 +494,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleDial(Recipient recipient) {
+    Log.d(TAG, "HANDLE DIAL");
     try {
       if (recipient == null) return;
 
@@ -491,10 +510,12 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleDisplayGroupRecipients() {
+    Log.d(TAG, "HANDLE DISPLAY GROUP RECIPIENTS");
     new GroupMembersDialog(this, getRecipients()).display();
   }
 
   private void handleDeleteThread() {
+    Log.d(TAG, "HANDLE DELETE THREAD");
     AlertDialogWrapper.Builder builder = new AlertDialogWrapper.Builder(this);
     builder.setTitle(R.string.ConversationActivity_delete_thread_confirmation);
     builder.setIconAttribute(R.attr.dialog_alert_icon);
@@ -504,6 +525,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
       @Override
       public void onClick(DialogInterface dialog, int which) {
         if (threadId > 0) {
+          Log.d(TAG, "DELETING THREAD, ID will = -1");
           DatabaseFactory.getThreadDatabase(ConversationActivity.this).deleteConversation(threadId);
           composeText.getText().clear();
           threadId = -1;
@@ -517,6 +539,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleAddToContacts() {
+    Log.d(TAG, "HANDLE ADD TO CONTACTS");
     final Intent intent = new Intent(Intent.ACTION_INSERT_OR_EDIT);
     intent.putExtra(ContactsContract.Intents.Insert.PHONE, recipients.getPrimaryRecipient().getNumber());
     intent.setType(ContactsContract.Contacts.CONTENT_ITEM_TYPE);
@@ -524,6 +547,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleAddAttachment() {
+    Log.d(TAG, "HANDLE ADD ATTACHMENT");
     if (this.isMmsEnabled || DirectoryHelper.isPushDestination(this, getRecipients())) {
       AlertDialogWrapper.Builder builder = new AlertDialogWrapper.Builder(this);
       builder.setIconAttribute(R.attr.conversation_attach_file);
@@ -536,6 +560,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void handleManualMmsRequired() {
+    Log.d(TAG, "HANDLE MANUAL MMS REQUIRED");
     Toast.makeText(this, R.string.MmsDownloader_error_reading_mms_settings, Toast.LENGTH_LONG).show();
 
     Intent intent = new Intent(this, PromptMmsActivity.class);
@@ -546,6 +571,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   ///// Initializers
 
   private void initializeTitleBar() {
+    Log.d(TAG, "INIT TITLE BAR");
     final String    title;
     final String    subtitle;
     final Recipient recipient = getRecipients().getPrimaryRecipient();
@@ -585,6 +611,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void initializeDraft() {
+    Log.d(TAG, "INIT DRAFT ");
     String draftText  = getIntent().getStringExtra(DRAFT_TEXT_EXTRA);
     Uri    draftImage = getIntent().getParcelableExtra(DRAFT_IMAGE_EXTRA);
     Uri    draftAudio = getIntent().getParcelableExtra(DRAFT_AUDIO_EXTRA);
@@ -601,12 +628,14 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void initializeEnabledCheck() {
+    Log.d(TAG, "INIT ENABLE CHECK");
     boolean enabled = !(isPushGroupConversation() && !isActiveGroup());
     composeText.setEnabled(enabled);
     sendButton.setEnabled(enabled);
   }
 
   private void initializeDraftFromDatabase() {
+    Log.d(TAG, "INIT DRAFT FROM DB");
     new AsyncTask<Void, Void, List<Draft>>() {
       @Override
       protected List<Draft> doInBackground(Void... params) {
@@ -644,6 +673,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void initializeSecurity() {
+    Log.d(TAG, "INIT SECURITY");
     boolean isMediaMessage = !recipients.isSingleRecipient() || attachmentManager.isAttachmentPresent();
     this.isEncryptedConversation = DirectoryHelper.isPushDestination(this, getRecipients());
 
@@ -659,6 +689,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void initializeMmsEnabledCheck() {
+    Log.d(TAG, "INIT MMS ENABLED CHECK");
     new AsyncTask<Void, Void, Boolean>() {
       @Override
       protected Boolean doInBackground(Void... params) {
@@ -673,6 +704,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void initializeIme() {
+    Log.d(TAG, "INIT IME");
     if (TextSecurePreferences.isEnterSendsEnabled(this)) {
       composeText.setInputType (composeText.getInputType()  & ~InputType.TYPE_TEXT_FLAG_MULTI_LINE);
       composeText.setImeOptions(composeText.getImeOptions() & ~EditorInfo.IME_FLAG_NO_ENTER_ACTION);
@@ -683,6 +715,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void initializeViews() {
+    Log.d(TAG, "INIT VIEWS");
     sendButton     = (SendButton)  findViewById(R.id.send_button);
     composeText    = (ComposeText) findViewById(R.id.embedded_text_editor);
     charactersLeft = (TextView)    findViewById(R.id.space_left);
@@ -714,6 +747,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private EmojiDrawer initializeEmojiDrawer() {
+    Log.d(TAG, "INIT EMOJI DRAWER");
     EmojiDrawer emojiDrawer = (EmojiDrawer)((ViewStub)findViewById(R.id.emoji_drawer_stub)).inflate();
     emojiDrawer.setComposeEditText(composeText);
     return emojiDrawer;
@@ -724,15 +758,18 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
     threadId         = getIntent().getLongExtra(THREAD_ID_EXTRA, -1);
     distributionType = getIntent().getIntExtra(DISTRIBUTION_TYPE_EXTRA, ThreadDatabase.DistributionTypes.DEFAULT);
 
+    Log.d(TAG, "INIT RESOURCES, " + recipients.toShortString() + " | " + threadId);
     recipients.addListener(this);
   }
 
   @Override
   public void onModified(Recipient recipient) {
+    Log.d(TAG, "ON MODIFIED");
     initializeTitleBar();
   }
 
   private void initializeReceivers() {
+    Log.d(TAG, "INIT RECEIVERS");
     securityUpdateReceiver = new BroadcastReceiver() {
       @Override
       public void onReceive(Context context, Intent intent) {
@@ -770,6 +807,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   //////// Helper Methods
 
   private void addAttachment(int type) {
+    Log.d(TAG, "ADD ATTACH " + type);
     Log.w("ComposeMessageActivity", "Selected: " + type);
     switch (type) {
     case AttachmentTypeSelectorAdapter.ADD_IMAGE:
@@ -784,6 +822,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void addAttachmentImage(Uri imageUri) {
+    Log.d(TAG, "ADD ATTACH IMAGE ");
     try {
       attachmentManager.setImage(imageUri);
     } catch (IOException | BitmapDecodingException e) {
@@ -795,6 +834,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void addAttachmentVideo(Uri videoUri) {
+    Log.d(TAG, "ADD ATTACH VIDEO");
     try {
       attachmentManager.setVideo(videoUri);
     } catch (IOException e) {
@@ -813,6 +853,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void addAttachmentAudio(Uri audioUri) {
+    Log.d(TAG, "ADD ATTACH AUDIO");
     try {
       attachmentManager.setAudio(audioUri);
     } catch (IOException e) {
@@ -830,6 +871,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void addAttachmentContactInfo(Uri contactUri) {
+    Log.d(TAG, "ADD ATTACH CONTACT INFO");
     ContactAccessor contactDataList = ContactAccessor.getInstance();
     ContactData contactData = contactDataList.getContactData(this, contactUri);
 
@@ -876,6 +918,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void saveDraft() {
+    Log.d(TAG, "SAVE DRAFT");
     if (this.recipients == null || this.recipients.isEmpty())
       return;
 
@@ -960,6 +1003,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void markThreadAsRead() {
+    Log.d(TAG, "MARK THREAD AS READ");
     new AsyncTask<Long, Void, Void>() {
       @Override
       protected Void doInBackground(Long... params) {
@@ -971,6 +1015,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void sendComplete(long threadId) {
+    Log.d(TAG, "SEND COMPLETE >> " + threadId);
     boolean refreshFragment = (threadId != this.threadId);
     this.threadId = threadId;
 
@@ -989,6 +1034,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   }
 
   private void sendMessage() {
+    Log.d(TAG, "SEND MESSAGE");
     try {
       Recipients recipients = getRecipients();
       boolean    forceSms   = sendButton.isManualSelection() && sendButton.getSelectedTransport().isSms();
@@ -1022,6 +1068,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   private void sendMediaMessage(final boolean forceSms)
       throws InvalidMessageException
   {
+    Log.d(TAG, "SEND MEDIA MESSAGE");
     final Context context = getApplicationContext();
     SlideDeck slideDeck;
 
@@ -1054,6 +1101,7 @@ public class ConversationActivity extends PassphraseRequiredActionBarActivity
   private void sendTextMessage(final boolean forceSms)
       throws InvalidMessageException
   {
+    Log.d(TAG, "SEND TEXT MESSAGE");
     final Context context = getApplicationContext();
     OutgoingTextMessage message;
 

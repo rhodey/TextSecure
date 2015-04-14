@@ -19,6 +19,7 @@ package org.thoughtcrime.securesms;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -87,18 +88,21 @@ public class ConversationAdapter extends CursorAdapter implements AbsListView.Re
     String type                 = cursor.getString(cursor.getColumnIndexOrThrow(MmsSmsDatabase.TRANSPORT));
     MessageRecord messageRecord = getMessageRecord(id, cursor, type);
 
+    Log.d(getClass().getName(), "BIND VIEW >> " + id);
     item.set(masterSecret, messageRecord, batchSelected, selectionClickListener,
              groupThread, pushDestination);
   }
 
   @Override
   public void changeCursor(Cursor cursor) {
+    Log.d(getClass().getName(), "CHANGE CURSOR");
     messageRecordCache.clear();
     super.changeCursor(cursor);
   }
 
   @Override
   public View newView(Context context, Cursor cursor, ViewGroup parent) {
+    Log.d(getClass().getName(), "NEW VIEW");
     View view;
 
     int type = getItemViewType(cursor);
@@ -161,10 +165,12 @@ public class ConversationAdapter extends CursorAdapter implements AbsListView.Re
   }
 
   public void close() {
+    Log.d(getClass().getName(), "CLOSE!!!");
     this.getCursor().close();
   }
 
   public void toggleBatchSelected(MessageRecord messageRecord) {
+    Log.d(getClass().getName(), "TOGGLE BATCH SELECT");
     if (batchSelected.contains(messageRecord)) {
       batchSelected.remove(messageRecord);
     } else {
@@ -178,6 +184,7 @@ public class ConversationAdapter extends CursorAdapter implements AbsListView.Re
 
   @Override
   public void onMovedToScrapHeap(View view) {
+    Log.d(getClass().getName(), "ON MOVED TO SCRAP HEAP >> " + ((ConversationItem)view).getMessageRecord().getId());
     ((ConversationItem)view).unbind();
   }
 }
