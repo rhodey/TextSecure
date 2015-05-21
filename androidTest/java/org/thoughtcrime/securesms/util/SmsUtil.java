@@ -40,6 +40,7 @@ public class SmsUtil {
   credit :D
   http://stackoverflow.com/a/12338541
    */
+  @SuppressWarnings("unchecked")
   public static byte[] buildSmsPdu(String senderPstnNumber, String body) throws Exception{
     byte[]   scBytes     = PhoneNumberUtils.networkPortionToCalledPartyBCD("0000000000");
     byte[]   senderBytes = PhoneNumberUtils.networkPortionToCalledPartyBCD(senderPstnNumber);
