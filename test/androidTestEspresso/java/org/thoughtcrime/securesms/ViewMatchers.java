@@ -23,6 +23,9 @@ import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+import se.emilsjolander.stickylistheaders.WrapperView;
+
 public class ViewMatchers {
 
   public static Matcher<View> withRecyclerItem(final Matcher<Object> itemMatcher) {
@@ -65,6 +68,32 @@ public class ViewMatchers {
 
         RecyclerView recyclerView = ((RecyclerView) view);
         return recyclerView.getChildCount() == itemCount;
+      }
+    };
+  }
+
+  public static Matcher<View> withStickyHeadersItem(final Matcher<Object> itemMatcher) {
+    return new TypeSafeMatcher<View>() {
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("with sticky headers item: ");
+        itemMatcher.describeTo(description);
+      }
+
+      @Override
+      public boolean matchesSafely(View view) {
+        if (!(view instanceof StickyListHeadersListView)) {
+          return false;
+        }
+
+        StickyListHeadersListView stickyListView = ((StickyListHeadersListView) view);
+        for (int i = 0; i < stickyListView.getWrappedList().getChildCount(); i++) {
+          WrapperView wrappedChild = (WrapperView) stickyListView.getWrappedList().getChildAt(i);
+          if (itemMatcher.matches(wrappedChild.getItem())) {
+            return true;
+          }
+        }
+        return false;
       }
     };
   }

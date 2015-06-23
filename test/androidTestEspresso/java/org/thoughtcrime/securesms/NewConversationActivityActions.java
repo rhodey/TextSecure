@@ -16,12 +16,24 @@
  */
 package org.thoughtcrime.securesms;
 
+import android.content.Context;
+import android.content.res.TypedArray;
+import android.widget.TextView;
+
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeMatcher;
+import org.thoughtcrime.securesms.contacts.ContactSelectionListItem;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
+import static org.thoughtcrime.securesms.ViewMatchers.withStickyHeadersItem;
 
 public class NewConversationActivityActions {
 
@@ -37,6 +49,40 @@ public class NewConversationActivityActions {
   @SuppressWarnings("unchecked")
   public static void clickContactWithNumber(String number) throws Exception {
     onView(allOf(withId(R.id.number), withText(containsString(number)))).perform(click());
+  }
+
+  public static Matcher<Object> isTsContact(final Context context, final String name) {
+    return new TypeSafeMatcher<Object>() {
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("is TextSecure contact: " + name);
+      }
+
+      @Override
+      public boolean matchesSafely(Object object) {
+        TypedArray drawables = context.obtainStyledAttributes(new int[] {R.attr.contact_selection_push_user});
+        try {
+          if (!(object instanceof ContactSelectionListItem)) {
+            return false;
+          }
+
+          ContactSelectionListItem contactItem = (ContactSelectionListItem) object;
+          TextView                 nameView    = (TextView) contactItem.findViewById(R.id.name);
+          return nameView.getText().toString().equals(name) &&
+                 nameView.getCurrentTextColor() == drawables.getColor(0, 0xa0000000);
+        } finally {
+          drawables.recycle();
+        }
+      }
+    };
+  }
+
+  @SuppressWarnings("unchecked")
+  public static void clickTsContactWithName(Context context, String name) {
+    onView(withId(android.R.id.list)).check(matches(allOf(
+        isDisplayed(),
+        withStickyHeadersItem(isTsContact(context, name))
+    ))).perform(click());
   }
 
 }

@@ -24,7 +24,7 @@ import static android.support.test.espresso.Espresso.openContextualActionModeOve
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
-import static org.thoughtcrime.securesms.EspressoUtil.typeTextAndCloseKeyboard;
+import static org.thoughtcrime.securesms.EspressoUtil.replaceTextAndCloseKeyboard;
 
 public class ConversationActivityActions {
 
@@ -53,7 +53,7 @@ public class ConversationActivityActions {
   }
 
   public static void typeMessage(String message) throws Exception {
-    typeTextAndCloseKeyboard(onView(withId(R.id.embedded_text_editor)), message);
+    replaceTextAndCloseKeyboard(onView(withId(R.id.embedded_text_editor)), message);
   }
 
   public static void clickSend() throws Exception {
